@@ -20,6 +20,7 @@
 #ifndef BTRFS_UTIL_H
 #define BTRFS_UTIL_H
 
+#include <stddef.h>
 #include <stdint.h>
 
 #define BTRFS_UTIL_VERSION_MAJOR 1
@@ -101,6 +102,50 @@ enum btrfs_util_error btrfs_util_subvolume_id(const char *path,
  * btrfs_util_subvolume_id_fd() - See btrfs_util_subvolume_id().
  */
 enum btrfs_util_error btrfs_util_subvolume_id_fd(int fd, uint64_t *id_ret);
+
+struct btrfs_util_qgroup_inherit;
+
+/**
+ * btrfs_util_create_qgroup_inherit() - Create a qgroup inheritance specifier
+ * for btrfs_util_create_subvolume() or btrfs_util_create_snapshot().
+ * @flags: Must be zero.
+ * @ret: Returned qgroup inheritance specifier.
+ *
+ * The returned structure must be freed with
+ * btrfs_util_destroy_qgroup_inherit().
+ *
+ * Return: %BTRFS_UTIL_OK on success, non-zero error code on failure.
+ */
+enum btrfs_util_error btrfs_util_create_qgroup_inherit(int flags,
+						       struct btrfs_util_qgroup_inherit **ret);
+
+/**
+ * btrfs_util_destroy_qgroup_inherit() - Destroy a qgroup inheritance specifier
+ * previously created with btrfs_util_create_qgroup_inherit().
+ * @inherit: Specifier to destroy.
+ */
+void btrfs_util_destroy_qgroup_inherit(struct btrfs_util_qgroup_inherit *inherit);
+
+/**
+ * btrfs_util_qgroup_inherit_add_group() - Add inheritance from a qgroup to a
+ * qgroup inheritance specifier.
+ * @inherit: Specifier to modify. May be reallocated.
+ * @qgroupid: ID of qgroup to inherit from.
+ *
+ * Return: %BTRFS_UTIL_OK on success, non-zero error code on failure.
+ */
+enum btrfs_util_error btrfs_util_qgroup_inherit_add_group(struct btrfs_util_qgroup_inherit **inherit,
+							  uint64_t qgroupid);
+
+/**
+ * btrfs_util_qgroup_inherit_get_groups() - Get the qgroups a qgroup inheritance
+ * specifier contains.
+ * @inherit: Qgroup inheritance specifier.
+ * @groups: Returned array of qgroup IDs.
+ * @n: Returned number of entries in the @groups array.
+ */
+void btrfs_util_qgroup_inherit_get_groups(const struct btrfs_util_qgroup_inherit *inherit,
+					  const uint64_t **groups, size_t *n);
 
 #ifdef __cplusplus
 }
