@@ -91,6 +91,7 @@ module = Extension(
         'constants.c',
         'error.c',
         'module.c',
+        'subvolume.c',
     ],
     include_dirs=['..'],
     library_dirs=['../..'],

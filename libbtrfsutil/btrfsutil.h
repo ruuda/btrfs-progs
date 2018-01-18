@@ -20,6 +20,8 @@
 #ifndef BTRFS_UTIL_H
 #define BTRFS_UTIL_H
 
+#include <stdint.h>
+
 #define BTRFS_UTIL_VERSION_MAJOR 1
 #define BTRFS_UTIL_VERSION_MINOR 0
 #define BTRFS_UTIL_VERSION_PATCH 0
@@ -68,6 +70,37 @@ enum btrfs_util_error {
  * Return: Error description.
  */
 const char *btrfs_util_strerror(enum btrfs_util_error err);
+
+/**
+ * btrfs_util_is_subvolume() - Return whether a given path is a Btrfs subvolume.
+ * @path: Path to check.
+ *
+ * Return: %BTRFS_UTIL_OK if @path is a Btrfs subvolume,
+ * %BTRFS_UTIL_ERROR_NOT_BTRFS if @path is not on a Btrfs filesystem,
+ * %BTRFS_UTIL_ERROR_NOT_SUBVOLUME if @path is not a subvolume, non-zero error
+ * code on any other failure.
+ */
+enum btrfs_util_error btrfs_util_is_subvolume(const char *path);
+
+/**
+ * btrfs_util_is_subvolume_fd() - See btrfs_util_is_subvolume().
+ */
+enum btrfs_util_error btrfs_util_is_subvolume_fd(int fd);
+
+/**
+ * btrfs_util_subvolume_id() - Get the ID of the subvolume containing a path.
+ * @path: Path on a Btrfs filesystem.
+ * @id_ret: Returned subvolume ID.
+ *
+ * Return: %BTRFS_UTIL_OK on success, non-zero error code on failure.
+ */
+enum btrfs_util_error btrfs_util_subvolume_id(const char *path,
+					      uint64_t *id_ret);
+
+/**
+ * btrfs_util_subvolume_id_fd() - See btrfs_util_subvolume_id().
+ */
+enum btrfs_util_error btrfs_util_subvolume_id_fd(int fd, uint64_t *id_ret);
 
 #ifdef __cplusplus
 }

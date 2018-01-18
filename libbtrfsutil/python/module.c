@@ -132,6 +132,18 @@ void path_cleanup(struct path_arg *path)
 }
 
 static PyMethodDef btrfsutil_methods[] = {
+	{"is_subvolume", (PyCFunction)is_subvolume,
+	 METH_VARARGS | METH_KEYWORDS,
+	 "is_subvolume(path) -> bool\n\n"
+	 "Get whether a file is a subvolume.\n\n"
+	 "Arguments:\n"
+	 "path -- string, bytes, path-like object, or open file descriptor"},
+	{"subvolume_id", (PyCFunction)subvolume_id,
+	 METH_VARARGS | METH_KEYWORDS,
+	 "subvolume_id(path) -> int\n\n"
+	 "Get the ID of the subvolume containing a file.\n\n"
+	 "Arguments:\n"
+	 "path -- string, bytes, path-like object, or open file descriptor"},
 	{},
 };
 

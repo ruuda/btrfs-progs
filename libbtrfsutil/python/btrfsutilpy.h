@@ -52,6 +52,9 @@ void SetFromBtrfsUtilErrorWithPaths(enum btrfs_util_error err,
 				    struct path_arg *path1,
 				    struct path_arg *path2);
 
+PyObject *is_subvolume(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *subvolume_id(PyObject *self, PyObject *args, PyObject *kwds);
+
 void add_module_constants(PyObject *m);
 
 #endif /* BTRFSUTILPY_H */
