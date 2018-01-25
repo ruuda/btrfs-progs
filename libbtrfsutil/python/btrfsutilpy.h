@@ -63,6 +63,9 @@ void SetFromBtrfsUtilErrorWithPaths(enum btrfs_util_error err,
 				    struct path_arg *path1,
 				    struct path_arg *path2);
 
+PyObject *filesystem_sync(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *start_sync(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *wait_sync(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *is_subvolume(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *subvolume_id(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *subvolume_path(PyObject *self, PyObject *args, PyObject *kwds);
