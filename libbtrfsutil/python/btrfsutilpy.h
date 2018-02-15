@@ -60,7 +60,7 @@ void SetFromBtrfsUtilErrorWithPaths(enum btrfs_util_error err,
 
 PyObject *is_subvolume(PyObject *self, PyObject *args, PyObject *kwds);
 PyObject *subvolume_id(PyObject *self, PyObject *args, PyObject *kwds);
-PyObject *create_subvolume(PyObject *self, PyObject *args, PyObject *kwds);
+PyObject *subvolume_path(PyObject *self, PyObject *args, PyObject *kwds);
 
 void add_module_constants(PyObject *m);
 
