@@ -27,7 +27,7 @@
 #include <sys/types.h>
 #include <sys/vfs.h>
 #include <linux/btrfs.h>
-#include <linux/btrfs_tree.h>
+/* #include <linux/btrfs_tree.h> */
 #include <linux/magic.h>
 
 #include "btrfsutil_internal.h"
