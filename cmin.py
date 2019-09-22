@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 
-import sys
 import hashlib
+import os.path
+import sys
 from collections import defaultdict
 from typing import Dict, NamedTuple
 
@@ -23,10 +24,10 @@ def load(fname: str) -> Dict[int, int]:
             assert len(data) == 5
 
             offset = int.from_bytes(data[:4], byteorder='big')
-            offset = min(file_len - 1, offset)
-            value = data[4]
+            if offset >= file_len:
+                continue
 
-            mutations[offset] = value
+            mutations[offset] = data[4]
 
 
 def normalize(mutations: Dict[int, int]) -> bytes:
@@ -57,6 +58,8 @@ def main() -> None:
 
     for data in normed_mutations_list:
         name = hashlib.sha224(data).hexdigest()[:30]
+        if os.path.isfile(f'cmin/{name}'):
+            continue
         with open(f'cmin/{name}', 'wb') as f:
             print(name, len(data))
             f.write(data)
