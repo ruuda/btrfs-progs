@@ -1381,10 +1381,22 @@ int btrfs_check_super(struct btrfs_super_block *sb, unsigned sbflags)
 	btrfs_csum_final(crc, result);
 
   // Disable checksum verification for fuzzing.
-	// if (memcmp(result, sb->csum, csum_size)) {
+	if (memcmp(result, sb->csum, csum_size)) {
+    if (false) {
+      size_t i;
+      printf("To fix csum mismatch: \" sed -i 's/");
+      for (i = 0; i < csum_size; i++) {
+        printf("\\x%02x", sb->csum[i]);
+      }
+      printf("/");
+      for (i = 0; i < csum_size; i++) {
+        printf("\\x%02x", result[i]);
+      }
+      printf("/' file.btrfs\"\n");
+    }
 	// 	error("superblock checksum mismatch");
 	// 	return -EIO;
-	// }
+	}
 	if (btrfs_super_root_level(sb) >= BTRFS_MAX_LEVEL) {
 		error("tree_root level too big: %d >= %d",
 			btrfs_super_root_level(sb), BTRFS_MAX_LEVEL);
