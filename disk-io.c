@@ -161,6 +161,9 @@ static int __csum_tree_block_size(struct extent_buffer *buf, u16 csum_size,
 
 	if (verify) {
 		if (memcmp_extent_buffer(buf, result, 0, csum_size)) {
+      // For fuzzing, pretend that the checksum matches.
+      return 0;
+      
 			if (!silent)
 				printk("checksum verify failed on %llu found %08X wanted %08X\n",
 				       (unsigned long long)buf->start,
@@ -1377,10 +1380,11 @@ int btrfs_check_super(struct btrfs_super_block *sb, unsigned sbflags)
 			      BTRFS_SUPER_INFO_SIZE - BTRFS_CSUM_SIZE);
 	btrfs_csum_final(crc, result);
 
-	if (memcmp(result, sb->csum, csum_size)) {
-		error("superblock checksum mismatch");
-		return -EIO;
-	}
+  // Disable checksum verification for fuzzing.
+	// if (memcmp(result, sb->csum, csum_size)) {
+	// 	error("superblock checksum mismatch");
+	// 	return -EIO;
+	// }
 	if (btrfs_super_root_level(sb) >= BTRFS_MAX_LEVEL) {
 		error("tree_root level too big: %d >= %d",
 			btrfs_super_root_level(sb), BTRFS_MAX_LEVEL);
