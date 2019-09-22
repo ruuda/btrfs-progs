@@ -9823,17 +9823,40 @@ static int cmd_check(const struct cmd_struct *cmd, int argc, char **argv)
 
   // Copy the base file to our target file.
   {
-    struct stat stat; loff_t len, ret;
+    struct stat stat;
     int cfd_in = open("/tmp/base.btrfs", O_RDONLY);
     if (fstat(cfd_in, &stat) == -1) { perror("fstat"); exit(EXIT_FAILURE); }
-    len = stat.st_size;
+    loff_t orig_len = stat.st_size;
+    loff_t len = orig_len;
     int cfd_out = open(argv[optind], O_WRONLY | O_TRUNC | O_CREAT, 0644);
     do {
-      ret = copy_file_range(cfd_in, NULL, cfd_out, NULL, len, 0);
+      loff_t ret = copy_file_range(cfd_in, NULL, cfd_out, NULL, len, 0);
       if (ret == -1) { perror("copy_file_range"); exit(EXIT_FAILURE); }
       len -= ret;
     } while (len > 0);
     close(cfd_in);
+
+    // Process stdin mutation instructions into the file. Each "instruction" is
+    // 5 bytes: an offset, and the byte to write there.
+    while (1) {
+      uint8_t buffer[5] = { 0, 0, 0, 0, 0 };
+      int num_read = read(STDIN_FILENO, buffer, 5);
+      if (num_read == 0) break;
+
+      loff_t off = 0
+        | ((loff_t)(buffer[0]) << 24)
+        | ((loff_t)(buffer[1]) << 16)
+        | ((loff_t)(buffer[2]) << 8)
+        | ((loff_t)(buffer[3]) << 0);
+
+      if (off >= orig_len) off = orig_len - 1;
+      if (off < 0) off = 0;
+      lseek(cfd_out, off, SEEK_SET);
+      int res = write(cfd_out, buffer + 4, 1);
+      // printf("put %u at %zu\n", buffer[4], off);
+      if (res == -1) { perror("write"); exit(EXIT_FAILURE); }
+    }
+
     close(cfd_out);
   }
 
