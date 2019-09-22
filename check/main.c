@@ -9968,7 +9968,7 @@ static int cmd_check(const struct cmd_struct *cmd, int argc, char **argv)
         | ((loff_t)(buffer[2]) << 8)
         | ((loff_t)(buffer[3]) << 0);
 
-      if (off >= orig_len) off = orig_len - 1;
+      if (off >= orig_len) exit(0);
       if (off < 0) off = 0;
       lseek(cfd_out, off, SEEK_SET);
       int res = write(cfd_out, buffer + 4, 1);
