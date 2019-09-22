@@ -9821,6 +9821,22 @@ static int cmd_check(const struct cmd_struct *cmd, int argc, char **argv)
 	unsigned ctree_flags = OPEN_CTREE_EXCLUSIVE;
 	int force = 0;
 
+  // Copy the base file to our target file.
+  {
+    struct stat stat; loff_t len, ret;
+    int cfd_in = open("/tmp/base.btrfs", O_RDONLY);
+    if (fstat(cfd_in, &stat) == -1) { perror("fstat"); exit(EXIT_FAILURE); }
+    len = stat.st_size;
+    int cfd_out = open(argv[optind], O_WRONLY | O_TRUNC | O_CREAT, 0644);
+    do {
+      ret = copy_file_range(cfd_in, NULL, cfd_out, NULL, len, 0);
+      if (ret == -1) { perror("copy_file_range"); exit(EXIT_FAILURE); }
+      len -= ret;
+    } while (len > 0);
+    close(cfd_in);
+    close(cfd_out);
+  }
+
 	while(1) {
 		int c;
 		enum { GETOPT_VAL_REPAIR = 257, GETOPT_VAL_INIT_CSUM,
