@@ -168,8 +168,13 @@ static int __csum_tree_block_size(struct extent_buffer *buf, u16 csum_size,
       lseek(cfd, buf->start, SEEK_SET);
       int res = write(cfd, result, csum_size);
       if (res == -1) { perror("write"); exit(EXIT_FAILURE); }
+      if (res != csum_size) { exit(EXIT_FAILURE); }
       close(cfd);
-      printf("Repaired one csum.\n");
+      printf("Repaired one csum at %llu: %08x -> %08x.\n",
+         (unsigned long long)buf->start,
+         *((u32*)(char *)buf->data),
+         *((u32 *)result)
+      );
       exit(0);
       
 			if (!silent)
