@@ -164,8 +164,9 @@ static int __csum_tree_block_size(struct extent_buffer *buf, u16 csum_size,
       // For fuzzing, pretend that the checksum matches.
       // Disable the branch above to write new csum.
       // XXX
+      printf("len: %i, start: %zu, bytenr: %zu\n", len, buf->start, buf->dev_bytenr);
       int cfd = open("/tmp/bad.btrfs", O_WRONLY);
-      lseek(cfd, buf->start, SEEK_SET);
+      lseek(cfd, buf->dev_bytenr, SEEK_SET);
       int res = write(cfd, result, csum_size);
       if (res == -1) { perror("write"); exit(EXIT_FAILURE); }
       if (res != csum_size) { exit(EXIT_FAILURE); }
