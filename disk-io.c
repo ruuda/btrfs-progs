@@ -162,7 +162,15 @@ static int __csum_tree_block_size(struct extent_buffer *buf, u16 csum_size,
 	if (verify) {
 		if (memcmp_extent_buffer(buf, result, 0, csum_size)) {
       // For fuzzing, pretend that the checksum matches.
-      return 0;
+      // Disable the branch above to write new csum.
+      // XXX
+      int cfd = open("/tmp/bad.btrfs", O_WRONLY);
+      lseek(cfd, buf->start, SEEK_SET);
+      int res = write(cfd, result, csum_size);
+      if (res == -1) { perror("write"); exit(EXIT_FAILURE); }
+      close(cfd);
+      printf("Repaired one csum.\n");
+      exit(0);
       
 			if (!silent)
 				printk("checksum verify failed on %llu found %08X wanted %08X\n",
@@ -172,6 +180,7 @@ static int __csum_tree_block_size(struct extent_buffer *buf, u16 csum_size,
 			return 1;
 		}
 	} else {
+    printf("Wrote new csum\n");
 		write_extent_buffer(buf, result, 0, csum_size);
 	}
 	return 0;
@@ -1382,7 +1391,7 @@ int btrfs_check_super(struct btrfs_super_block *sb, unsigned sbflags)
 
   // Disable checksum verification for fuzzing.
 	if (memcmp(result, sb->csum, csum_size)) {
-    if (false) {
+    if (true) {
       size_t i;
       printf("To fix csum mismatch: \" sed -i 's/");
       for (i = 0; i < csum_size; i++) {

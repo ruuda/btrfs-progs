@@ -9941,7 +9941,7 @@ static int cmd_check(const struct cmd_struct *cmd, int argc, char **argv)
 	}
 
   // Copy the base file to our target file.
-  if (true) {
+  if (false) {
     struct stat stat;
     int cfd_in = open("/tmp/base.btrfs", O_RDONLY);
     if (fstat(cfd_in, &stat) == -1) { perror("fstat"); exit(EXIT_FAILURE); }
